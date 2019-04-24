@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.StartController">
+    <children>
+        <Button layoutX="200.0" layoutY="442.0" mnemonicParsing="false" onAction="#onStartClick" prefHeight="30.0" prefWidth="100.0" text="Start" />
+        <ComboBox layoutX="251.0" layoutY="39.0" prefHeight="31.0" prefWidth="215.0" />
+        <Label layoutX="47.0" layoutY="44.0" text="Typ algorytmu" />
+        <Label layoutX="47.0" layoutY="111.0" text="Typ rozgrywki" />
+        <ComboBox layoutX="251.0" layoutY="106.0" prefHeight="31.0" prefWidth="215.0" />
+        <Label layoutX="47.0" layoutY="184.0" text="Heurystyka" />
+        <ComboBox layoutX="250.0" layoutY="179.0" prefHeight="31.0" prefWidth="215.0" />
+        <CheckBox layoutX="47.0" layoutY="250.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="187.0" text="Pomiar czasu" />
+        <CheckBox layoutX="47.0" layoutY="308.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="187.0" text="Pomiar liczby ruchów" />
+        <CheckBox layoutX="47.0" layoutY="368.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="187.0" text="Logowanie ruchów" />
+    </children>
+</Pane>
