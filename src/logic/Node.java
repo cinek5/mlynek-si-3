@@ -47,4 +47,10 @@ public class Node {
     }
 
 
+    @Override
+    public String toString() {
+        if (nodeType==NodeType.WHITE) return " W";
+        else if (nodeType==NodeType.BLACK) return " B";
+        else return String.format("%2d", index);
+    }
 }

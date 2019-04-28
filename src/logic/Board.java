@@ -8,6 +8,7 @@ import logic.moves.PlacingMove;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Cinek on 24.04.2019.
@@ -15,54 +16,67 @@ import java.util.List;
 public class Board {
     private List<Node> nodes;
     private List<Line> lines;
+    private static final String BOARD_TEMPLATE =
+                            "7 %s=============%s============%s\n" +
+                                    "  |              |              |\n" +
+                                    "6 |     %s=======%s=======%s    |\n" +
+                                    "  |     |        |         |    |\n" +
+                                    "5 |     |   %s===%s===%s   |    |\n" +
+                                    "  |     |    |   ||    |   |    |\n" +
+                                    "4 %s====%s==%s===||===%s==%s====%s\n" +
+                                    "  |     |    |   ||    |   |    |\n" +
+                                    "3 |     |   %s===%s===%s   |    |\n" +
+                                    "  |     |        |         |    |\n" +
+                                    "2 |     %s=======%s=======%s    |\n" +
+                                    "  |              |              |\n" +
+                                    "1 %s=============%s============%s\n" +
+                                    "   a     b   c   d     e   f    g";
 
-    public Board()
-    {
+
+    public Board() {
         createNodes();
         createLines();
     }
 
+    public void printBoard() {
+        List<String> args = nodes.stream().map(node ->node.toString()).collect(Collectors.toList());
+        String[] argsArray = new String[24];
+        argsArray = args.toArray(argsArray);
+        System.out.println(String.format(BOARD_TEMPLATE, argsArray));
 
-    public  Node getNode(int index)
-    {
-       return nodes.get(index);
     }
 
-    public void makeMove(Move move)
-    {
-        if (move instanceof PlacingMove)
-        {
-            makePlacingMove((PlacingMove)move);
+
+    public Node getNode(int index) {
+        return nodes.get(index-1);
+    }
+
+    public void makeMove(Move move) {
+        if (move instanceof PlacingMove) {
+            makePlacingMove((PlacingMove) move);
         }
-        if (move instanceof CapturingMove)
-        {
+        if (move instanceof CapturingMove) {
             makeCapturingMove((CapturingMove) move);
         }
     }
 
-    private void makePlacingMove(PlacingMove move)
-    {
+    private void makePlacingMove(PlacingMove move) {
         int index = move.getNodeIndex();
-        nodes.get(index).setNodeType(move.getNodeType());
+        nodes.get(index-1).setNodeType(move.getNodeType());
     }
 
-    private void makeCapturingMove(CapturingMove move)
-    {
-       int index =  move.getCapturedNodeIndex();
-       nodes.get(index).setNodeType(null);
+    private void makeCapturingMove(CapturingMove move) {
+        int index = move.getCapturedNodeIndex();
+        nodes.get(index-1).setNodeType(null);
     }
 
-    private void makeMovingMove(MovingMove move)
-    {
+    private void makeMovingMove(MovingMove move) {
     }
 
-    public int countMills(NodeType nodeType)
-    {
-        int numberOfMills=0;
-        for (Line line: lines)
-        {
-            if (line.isMill(nodeType))
-            {
+    public int countMills(NodeType nodeType) {
+        int numberOfMills = 0;
+        for (Line line : lines) {
+            if (line.isMill(nodeType)) {
                 numberOfMills++;
             }
         }
@@ -70,8 +84,7 @@ public class Board {
     }
 
 
-    private void createLines()
-    {
+    private void createLines() {
         lines = Arrays.asList(
                 // mill combinations for the outer box
                 new Line(nodes.get(0), nodes.get(1), nodes.get(2)),
@@ -98,11 +111,9 @@ public class Board {
                 new Line(nodes.get(16), nodes.get(19), nodes.get(22)));
     }
 
-    private void createNodes()
-    {
+    private void createNodes() {
         nodes = new ArrayList<>(24);
-        for (int index=1; index<=24; index++)
-        {
+        for (int index = 1; index <= 24; index++) {
             nodes.add(new Node(index));
         }
     }

@@ -29,14 +29,14 @@ public class PlayerInput implements GameInput {
         String line = scanner.nextLine();
         if (controller.isWasMillInPreviousTurn())
         {
-            moveParser.parseCapturingMove(line, nodeType );
+           return  moveParser.parseCapturingMove(line, nodeType );
         }
         else
         {
             Phase gamePhase = controller.getGamePhase();
             if (gamePhase == Phase.PLACIING)
             {
-                moveParser.parsePlacingMove(line, nodeType);
+              return  moveParser.parsePlacingMove(line, nodeType);
             }
         }
 
