@@ -20,7 +20,7 @@ public class CapturingMove implements Move {
 
     @Override
     public boolean isLegal(Board board, PlayerTurn playerTurn) {
-        return false;
+        return board.getNode(capturedNodeIndex).getNodeType()== (playerTurn==PlayerTurn.WHITE? NodeType.BLACK : NodeType.WHITE);
     }
 
     public int getCapturedNodeIndex() {

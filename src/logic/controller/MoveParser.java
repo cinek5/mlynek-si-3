@@ -18,7 +18,8 @@ public class MoveParser {
     }
     public CapturingMove parseCapturingMove(String line, NodeType nodeType )
     {
-        return null;
+        int nodeIndex = Integer.parseInt(line);
+        return new CapturingMove(nodeIndex, nodeType);
     }
     public MovingMove parseMovingMove(String line, NodeType nodeType )
     {

@@ -16,6 +16,11 @@ import java.util.stream.Collectors;
 public class Board {
     private List<Node> nodes;
     private List<Line> lines;
+    private int numberOfWhitePiecesToBePlaced =9;
+    private int numberOfBlackPiecesToBePlaced =9;
+
+    private int numberOfWhitePiecesOnBoard = 0;
+    private int numberOfBlackPiecesOnBoard = 0;
     private static final String BOARD_TEMPLATE =
                             "7 %s=============%s============%s\n" +
                                     "  |              |              |\n" +
@@ -46,6 +51,13 @@ public class Board {
 
     }
 
+    public int getNumberOfWhitePiecesOnBoard() {
+        return numberOfWhitePiecesOnBoard;
+    }
+
+    public int getNumberOfBlackPiecesOnBoard() {
+        return numberOfBlackPiecesOnBoard;
+    }
 
     public Node getNode(int index) {
         return nodes.get(index-1);
@@ -62,13 +74,38 @@ public class Board {
 
     private void makePlacingMove(PlacingMove move) {
         int index = move.getNodeIndex();
-        nodes.get(index-1).setNodeType(move.getNodeType());
+        NodeType nodeType = move.getNodeType();
+        nodes.get(index-1).setNodeType(nodeType);
+
+        if (nodeType == NodeType.BLACK)
+        {
+            numberOfBlackPiecesToBePlaced--;
+            numberOfBlackPiecesOnBoard++;
+        }
+        else
+        {
+            numberOfWhitePiecesToBePlaced--;
+            numberOfWhitePiecesOnBoard++;
+        }
+
     }
 
     private void makeCapturingMove(CapturingMove move) {
         int index = move.getCapturedNodeIndex();
+        NodeType nodeType = move.getCapturedNodeType();
         nodes.get(index-1).setNodeType(null);
+        if (nodeType == NodeType.BLACK)
+        {
+            numberOfBlackPiecesOnBoard--;
+        }
+        else
+        {
+            numberOfWhitePiecesOnBoard--;
+        }
     }
+
+
+
 
     private void makeMovingMove(MovingMove move) {
     }
@@ -83,6 +120,13 @@ public class Board {
         return numberOfMills;
     }
 
+    public int getNumberOfWhitePiecesToBePlaced() {
+        return numberOfWhitePiecesToBePlaced;
+    }
+
+    public int getNumberOfBlackPiecesToBePlaced() {
+        return numberOfBlackPiecesToBePlaced;
+    }
 
     private void createLines() {
         lines = Arrays.asList(
@@ -117,5 +161,7 @@ public class Board {
             nodes.add(new Node(index));
         }
     }
+
+
 
 }

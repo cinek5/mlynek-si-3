@@ -23,6 +23,7 @@ public class GameController {
     private GameInput blackInput;
 
 
+
     public Queue<MovingMove> getMovesHistory() {
         return movesHistory;
     }
@@ -55,6 +56,8 @@ public class GameController {
 
             board.printBoard();
 
+            setGamePhase();
+
             boolean validMove = false;
             Move nextMove = null;
 
@@ -76,16 +79,9 @@ public class GameController {
 
 
 
+            switchPlayerTurn();
 
 
-            if (playerTurn == PlayerTurn.WHITE)
-            {
-                playerTurn = PlayerTurn.BLACK;
-            }
-            else
-            {
-                playerTurn = PlayerTurn.WHITE;
-            }
 
             int blackMills = board.countMills(NodeType.BLACK);
             int whiteMills = board.countMills(NodeType.WHITE);
@@ -93,16 +89,67 @@ public class GameController {
             if (blackMills>0)
             {
                 System.out.println("mlynek dla czarnucha");
+                playerTurn = PlayerTurn.BLACK;
             }
             if (whiteMills>0)
             {
                 System.out.println("mlynek dla białasa");
+                playerTurn = PlayerTurn.WHITE;
             }
+            wasMillInPreviousTurn = blackMills>0 || whiteMills>0;
+
+
+
+
 
 
         }
 
 
+    }
+
+    private void setGamePhase()
+    {
+        if (isMovingFreelyForPlayer(playerTurn))
+        {
+            gamePhase = Phase.PLACIING;
+        }
+        else if (isSlidingPhase())
+        {
+            gamePhase = Phase.SLIDING;
+        }
+        else
+        {
+            gamePhase = Phase.PLACIING;
+        }
+    }
+    private boolean isMovingFreelyForPlayer(PlayerTurn playerTurn)
+    {
+        if (playerTurn == PlayerTurn.WHITE)
+        {
+            return isSlidingPhase() && board.getNumberOfWhitePiecesOnBoard()<=3;
+        }
+        else
+        {
+            return isSlidingPhase() && board.getNumberOfBlackPiecesOnBoard()<=3;
+        }
+    }
+
+    private boolean isSlidingPhase()
+    {
+        return board.getNumberOfBlackPiecesToBePlaced()==0 && board.getNumberOfWhitePiecesToBePlaced()==0;
+    }
+
+    private void switchPlayerTurn()
+    {
+        if (playerTurn == PlayerTurn.WHITE)
+        {
+            playerTurn = PlayerTurn.BLACK;
+        }
+        else
+        {
+            playerTurn = PlayerTurn.WHITE;
+        }
     }
 
     private boolean someoneWon() {
