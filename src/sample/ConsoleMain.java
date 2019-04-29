@@ -12,7 +12,7 @@ public class ConsoleMain {
     {
         GameInput whiteInput = new PlayerInput(NodeType.WHITE);
         GameInput blackInput = new PlayerInput(NodeType.BLACK);
-        GameController gameController = new GameController(PlayerTurn.WHITE, whiteInput, blackInput);
+        GameController gameController = new GameController(NodeType.WHITE, whiteInput, blackInput);
         gameController.game();
     }
 }

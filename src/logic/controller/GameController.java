@@ -3,8 +3,8 @@ package logic.controller;
 import logic.Board;
 import logic.NodeType;
 import logic.Phase;
-import logic.moves.Move;
-import logic.moves.MovingMove;
+import logic.Utils;
+import logic.moves.*;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -13,22 +13,30 @@ import java.util.Queue;
  * Created by Cinek on 24.04.2019.
  */
 public class GameController {
-    private Queue<MovingMove> movesHistory;
-    private PlayerTurn playerTurn;
+    private Queue<Move> movesHistoryWhite;
+    private Queue<Move> movesHistoryBlack;
+    private NodeType playerTurn;
     private Phase gamePhase;
     private boolean wasMillInPreviousTurn;
     private Board board;
+
+    private Move lastNonCapturingMoveForWhite;
+    private Move lastNonCapturingMOveForBlack;
 
     private GameInput whiteInput;
     private GameInput blackInput;
 
 
 
-    public Queue<MovingMove> getMovesHistory() {
-        return movesHistory;
+    public Queue<Move> getMovesHistoryWhite() {
+        return movesHistoryWhite;
     }
 
-    public PlayerTurn getPlayerTurn() {
+    public Queue<Move> getMovesHistoryBlack() {
+        return movesHistoryBlack;
+    }
+
+    public NodeType getPlayerTurn() {
         return playerTurn;
     }
 
@@ -40,8 +48,9 @@ public class GameController {
         return wasMillInPreviousTurn;
     }
 
-    public GameController(PlayerTurn firstPlayerTurn, GameInput whiteInput, GameInput blackInput) {
-        this.movesHistory = new ArrayDeque<>();
+    public GameController(NodeType firstPlayerTurn, GameInput whiteInput, GameInput blackInput) {
+        this.movesHistoryWhite = new ArrayDeque<>();
+        this.movesHistoryBlack = new ArrayDeque<>();
         gamePhase = Phase.PLACIING;
         this.playerTurn = firstPlayerTurn;
         this.whiteInput = whiteInput;
@@ -63,19 +72,22 @@ public class GameController {
 
             System.out.println("Ruch gracza: "+playerTurn);
             while(!validMove) {
-                if (playerTurn == PlayerTurn.WHITE) {
+                if (playerTurn == NodeType.WHITE) {
                     nextMove = whiteInput.getMove(this);
 
                 } else {
                     nextMove = blackInput.getMove(this);
                 }
-                if (nextMove.isLegal(board, playerTurn))
+                if (nextMove.isLegal(this, playerTurn))
                 {
                     validMove = true;
                 }
             }
 
             board.makeMove(nextMove);
+
+
+            saveMove(nextMove);
 
 
 
@@ -89,12 +101,12 @@ public class GameController {
             if (blackMills>0)
             {
                 System.out.println("mlynek dla czarnucha");
-                playerTurn = PlayerTurn.BLACK;
+                playerTurn = NodeType.BLACK;
             }
             if (whiteMills>0)
             {
                 System.out.println("mlynek dla białasa");
-                playerTurn = PlayerTurn.WHITE;
+                playerTurn = NodeType.WHITE;
             }
             wasMillInPreviousTurn = blackMills>0 || whiteMills>0;
 
@@ -108,7 +120,57 @@ public class GameController {
 
     }
 
-    private void setGamePhase()
+    public boolean wasNodeHereInPreviousMove(NodeType nodeType, int index) {
+        Move previousMove;
+        if (nodeType == NodeType.BLACK) {
+            previousMove = lastNonCapturingMOveForBlack;
+        } else {
+            previousMove = lastNonCapturingMoveForWhite;
+        }
+
+        if (previousMove == null)
+        {
+            return false;
+        }
+        int lastIndex = -1;
+        if (previousMove instanceof PlacingMove)
+        {
+            lastIndex = ((PlacingMove) previousMove).getNodeIndex();
+        }
+        if (previousMove instanceof ChangePieceLocationMove)
+        {
+            lastIndex = ((ChangePieceLocationMove)previousMove).getToNodeIndex();
+        }
+
+        return lastIndex==index;
+
+
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    private void saveMove(Move move)
+    {
+        if (playerTurn==NodeType.WHITE)
+        {
+            movesHistoryWhite.add(move);
+            if (!(move instanceof CapturingMove))
+            {
+                lastNonCapturingMoveForWhite = move;
+            }
+        } else {
+            movesHistoryBlack.add(move);
+            if (!(move instanceof CapturingMove))
+            {
+                lastNonCapturingMOveForBlack = move;
+            }
+        }
+
+    }
+
+    private Phase setGamePhase()
     {
         if (isMovingFreelyForPlayer(playerTurn))
         {
@@ -122,10 +184,11 @@ public class GameController {
         {
             gamePhase = Phase.PLACIING;
         }
+        return gamePhase;
     }
-    private boolean isMovingFreelyForPlayer(PlayerTurn playerTurn)
+    private boolean isMovingFreelyForPlayer(NodeType playerTurn)
     {
-        if (playerTurn == PlayerTurn.WHITE)
+        if (playerTurn == NodeType.WHITE)
         {
             return isSlidingPhase() && board.getNumberOfWhitePiecesOnBoard()<=3;
         }
@@ -142,14 +205,7 @@ public class GameController {
 
     private void switchPlayerTurn()
     {
-        if (playerTurn == PlayerTurn.WHITE)
-        {
-            playerTurn = PlayerTurn.BLACK;
-        }
-        else
-        {
-            playerTurn = PlayerTurn.WHITE;
-        }
+        playerTurn = Utils.getOppositeNodeType(playerTurn);
     }
 
     private boolean someoneWon() {

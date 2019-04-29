@@ -3,7 +3,7 @@ package logic.moves;
 import logic.Board;
 import logic.Node;
 import logic.NodeType;
-import logic.controller.PlayerTurn;
+import logic.controller.GameController;
 
 /**
  * Created by Cinek on 24.04.2019.
@@ -14,14 +14,10 @@ public class PlacingMove implements  Move{
     private NodeType nodeType;
 
 
-    @Override
-    public String getRepresentation() {
-        return null;
-    }
 
     @Override
-    public boolean isLegal(Board board, PlayerTurn playerTurn){
-        Node node = board.getNode(nodeIndex);
+    public boolean isLegal(GameController controller, NodeType playerTurn){
+        Node node = controller.getBoard().getNode(nodeIndex);
         if (node.getNodeType()!=NodeType.NONE)
         {
             return false;

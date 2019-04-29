@@ -2,6 +2,7 @@ package logic.controller;
 
 import logic.NodeType;
 import logic.Phase;
+import logic.Utils;
 import logic.moves.Move;
 
 import java.util.Scanner;
@@ -29,14 +30,24 @@ public class PlayerInput implements GameInput {
         String line = scanner.nextLine();
         if (controller.isWasMillInPreviousTurn())
         {
-           return  moveParser.parseCapturingMove(line, nodeType );
+            NodeType oppositeType = Utils.getOppositeNodeType(nodeType);
+
+           return  moveParser.parseCapturingMove(line, oppositeType );
         }
         else
         {
             Phase gamePhase = controller.getGamePhase();
             if (gamePhase == Phase.PLACIING)
             {
-              return  moveParser.parsePlacingMove(line, nodeType);
+                return  moveParser.parsePlacingMove(line, nodeType);
+            }
+            if (gamePhase == Phase.SLIDING)
+            {
+                return moveParser.parseSlidingMove(line, nodeType);
+            }
+            if (gamePhase == Phase.MOVING_FREELY)
+            {
+                return moveParser.parseMovingMove(line, nodeType);
             }
         }
 

@@ -2,43 +2,27 @@ package logic.moves;
 
 import logic.Board;
 import logic.Node;
-import logic.controller.PlayerTurn;
+import logic.NodeType;
+import logic.controller.GameController;
+import sample.Controller;
 
 /**
  * Created by Cinek on 24.04.2019.
  */
-public class MovingMove implements Move {
-    private int fromNodeIndex;
-    private int toNodeIndex;
+public class MovingMove extends ChangePieceLocationMove {
+
 
     @Override
-    public String getRepresentation() {
-        return null;
+    public boolean isLegal(GameController controller, NodeType playerTurn) {
+
+        return controller.wasNodeHereInPreviousMove(playerTurn, getToNodeIndex()) &&
+                controller.getBoard().getNode(getToNodeIndex()-1).getNodeType() == NodeType.NONE &&
+                controller.getBoard().getNode(getFromNodeIndex()-1).getNodeType() == playerTurn;
     }
 
-    @Override
-    public boolean isLegal(Board board, PlayerTurn playerTurn) {
-        return false;
+    public MovingMove(int fromNodeIndex, int toNodeIndex, NodeType nodeType) {
+        super(fromNodeIndex, toNodeIndex, nodeType );
     }
 
-    public MovingMove(int fromNodeIndex, int toNodeIndex) {
-        this.fromNodeIndex = fromNodeIndex;
-        this.toNodeIndex = toNodeIndex;
-    }
 
-    public int getFromNodeIndex() {
-        return fromNodeIndex;
-    }
-
-    public void setFromNodeIndex(int fromNodeIndex) {
-        this.fromNodeIndex = fromNodeIndex;
-    }
-
-    public int getToNodeIndex() {
-        return toNodeIndex;
-    }
-
-    public void setToNodeIndex(int toNodeIndex) {
-        this.toNodeIndex = toNodeIndex;
-    }
 }

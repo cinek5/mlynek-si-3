@@ -3,7 +3,7 @@ package logic.moves;
 import logic.Board;
 import logic.Node;
 import logic.NodeType;
-import logic.controller.PlayerTurn;
+import logic.controller.GameController;
 
 /**
  * Created by Cinek on 24.04.2019.
@@ -14,13 +14,8 @@ public class CapturingMove implements Move {
     private NodeType capturedNodeType;
 
     @Override
-    public String getRepresentation() {
-        return null;
-    }
-
-    @Override
-    public boolean isLegal(Board board, PlayerTurn playerTurn) {
-        return board.getNode(capturedNodeIndex).getNodeType()== (playerTurn==PlayerTurn.WHITE? NodeType.BLACK : NodeType.WHITE);
+    public boolean isLegal(GameController controller, NodeType playerTurn) {
+        return controller.getBoard().getNode(capturedNodeIndex).getNodeType()==capturedNodeType;
     }
 
     public int getCapturedNodeIndex() {
