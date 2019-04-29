@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
+
 /**
  * Created by Cinek on 24.04.2019.
  */
@@ -129,7 +131,7 @@ public class Board {
     }
 
     private void createLines() {
-        lines = Arrays.asList(
+        lines = asList(
                 // mill combinations for the outer box
                 new Line(nodes.get(0), nodes.get(1), nodes.get(2)),
                 new Line(nodes.get(0), nodes.get(9), nodes.get(21)),
@@ -160,7 +162,38 @@ public class Board {
         for (int index = 1; index <= 24; index++) {
             nodes.add(new Node(index));
         }
+
+        // adjacent nodes for outer box
+        nodes.get(0).setAdjacentNodesIndexes(asList(1, 9));
+        nodes.get(1).setAdjacentNodesIndexes(asList(0, 2, 4));
+        nodes.get(2).setAdjacentNodesIndexes(asList(1, 14));
+        nodes.get(9).setAdjacentNodesIndexes(asList(0, 10, 21));
+        nodes.get(14).setAdjacentNodesIndexes(asList(2, 13, 23));
+        nodes.get(21).setAdjacentNodesIndexes(asList(9, 22));
+        nodes.get(22).setAdjacentNodesIndexes(asList(19, 21, 23));
+        nodes.get(23).setAdjacentNodesIndexes(asList(14, 22));
+
+        // adjacent nodes for middle box
+        nodes.get(3).setAdjacentNodesIndexes(asList(4, 10));
+        nodes.get(4).setAdjacentNodesIndexes(asList(1, 3, 5, 7));
+        nodes.get(5).setAdjacentNodesIndexes(asList(4, 13));
+        nodes.get(10).setAdjacentNodesIndexes(asList(3, 9, 11, 18));
+        nodes.get(13).setAdjacentNodesIndexes(asList(5, 12, 14, 20));
+        nodes.get(18).setAdjacentNodesIndexes(asList(10, 19));
+        nodes.get(19).setAdjacentNodesIndexes(asList(16, 18, 20, 22));
+        nodes.get(20).setAdjacentNodesIndexes(asList(13, 19));
+
+        // adjacent nodes for inner box
+        nodes.get(6).setAdjacentNodesIndexes(asList(7, 11));
+        nodes.get(7).setAdjacentNodesIndexes(asList(4, 6, 8));
+        nodes.get(8).setAdjacentNodesIndexes(asList(7, 12));
+        nodes.get(11).setAdjacentNodesIndexes(asList(6, 10, 15));
+        nodes.get(12).setAdjacentNodesIndexes(asList(8, 13, 17));
+        nodes.get(15).setAdjacentNodesIndexes(asList(11, 16));
+        nodes.get(16).setAdjacentNodesIndexes(asList(15, 17, 19));
+        nodes.get(17).setAdjacentNodesIndexes(asList(12, 16));
     }
+
 
 
 

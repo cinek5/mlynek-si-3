@@ -16,8 +16,8 @@ public class MovingMove extends ChangePieceLocationMove {
     public boolean isLegal(GameController controller, NodeType playerTurn) {
 
         return controller.wasNodeHereInPreviousMove(playerTurn, getToNodeIndex()) &&
-                controller.getBoard().getNode(getToNodeIndex()-1).getNodeType() == NodeType.NONE &&
-                controller.getBoard().getNode(getFromNodeIndex()-1).getNodeType() == playerTurn;
+                controller.getBoard().getNode(getToNodeIndex()).getNodeType() == NodeType.NONE &&
+                controller.getBoard().getNode(getFromNodeIndex()).getNodeType() == playerTurn;
     }
 
     public MovingMove(int fromNodeIndex, int toNodeIndex, NodeType nodeType) {

@@ -1,5 +1,7 @@
 package logic;
 
+import java.util.List;
+
 /**
  * Created by Cinek on 24.04.2019.
  */
@@ -7,6 +9,7 @@ public class Node {
     private int index;
     private NodeType nodeType;
     private Position position;
+    private List<Integer> adjacentNodesIndexes;
 
 
 
@@ -46,6 +49,13 @@ public class Node {
       return nodeType;
     }
 
+    public List<Integer> getAdjacentNodesIndexes() {
+        return adjacentNodesIndexes;
+    }
+
+    public void setAdjacentNodesIndexes(List<Integer> adjacentNodesIndexes) {
+        this.adjacentNodesIndexes = adjacentNodesIndexes;
+    }
 
     @Override
     public String toString() {
@@ -53,4 +63,6 @@ public class Node {
         else if (nodeType==NodeType.BLACK) return " B";
         else return String.format("%2d", index);
     }
+
+
 }
