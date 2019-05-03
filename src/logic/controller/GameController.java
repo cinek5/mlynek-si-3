@@ -21,7 +21,7 @@ public class GameController {
     private Board board;
 
     private Move lastNonCapturingMoveForWhite;
-    private Move lastNonCapturingMOveForBlack;
+    private Move lastNonCapturingMoveForBlack;
 
     private GameInput whiteInput;
     private GameInput blackInput;
@@ -51,7 +51,7 @@ public class GameController {
     public GameController(NodeType firstPlayerTurn, GameInput whiteInput, GameInput blackInput) {
         this.movesHistoryWhite = new ArrayDeque<>();
         this.movesHistoryBlack = new ArrayDeque<>();
-        gamePhase = Phase.PLACIING;
+        gamePhase = Phase.PLACING;
         this.playerTurn = firstPlayerTurn;
         this.whiteInput = whiteInput;
         this.blackInput = blackInput;
@@ -66,6 +66,7 @@ public class GameController {
             board.printBoard();
 
             setGamePhase();
+            System.out.println(gamePhase);
 
             boolean validMove = false;
             Move nextMove = null;
@@ -84,7 +85,7 @@ public class GameController {
                 }
             }
 
-            board.makeMove(nextMove);
+            nextMove.makeMove(board);
 
 
             saveMove(nextMove);
@@ -135,7 +136,7 @@ public class GameController {
     public boolean wasNodeHereInPreviousMove(NodeType nodeType, int index) {
         Move previousMove;
         if (nodeType == NodeType.BLACK) {
-            previousMove = lastNonCapturingMOveForBlack;
+            previousMove = lastNonCapturingMoveForBlack;
         } else {
             previousMove = lastNonCapturingMoveForWhite;
         }
@@ -151,7 +152,7 @@ public class GameController {
         }
         if (previousMove instanceof ChangePieceLocationMove)
         {
-            lastIndex = ((ChangePieceLocationMove)previousMove).getToNodeIndex();
+            lastIndex = ((ChangePieceLocationMove)previousMove).getFromNodeIndex();
         }
 
         return lastIndex==index;
@@ -176,7 +177,7 @@ public class GameController {
             movesHistoryBlack.add(move);
             if (!(move instanceof CapturingMove))
             {
-                lastNonCapturingMOveForBlack = move;
+                lastNonCapturingMoveForBlack = move;
             }
         }
 
@@ -186,7 +187,7 @@ public class GameController {
     {
         if (isMovingFreelyForPlayer(playerTurn))
         {
-            gamePhase = Phase.PLACIING;
+            gamePhase = Phase.PLACING;
         }
         else if (isSlidingPhase())
         {
@@ -194,7 +195,7 @@ public class GameController {
         }
         else
         {
-            gamePhase = Phase.PLACIING;
+            gamePhase = Phase.PLACING;
         }
         return gamePhase;
     }
@@ -214,11 +215,11 @@ public class GameController {
     {
         if (playerTurn==NodeType.BLACK)
         {
-            return board.getNumberOfBlackPiecesOnBoard()==0;
+            return board.getNumberOfBlackPiecesToBePlaced()==0;
         }
         else
         {
-            return board.getNumberOfWhitePiecesOnBoard()==0;
+            return board.getNumberOfWhitePiecesToBePlaced()==0;
         }
     }
 

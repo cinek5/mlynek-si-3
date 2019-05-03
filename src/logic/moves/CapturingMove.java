@@ -19,6 +19,37 @@ public class CapturingMove implements Move {
         return isNodeOppositeColor;
     }
 
+    @Override
+    public void makeMove(Board board) {
+        int index = getCapturedNodeIndex();
+        NodeType nodeType = getCapturedNodeType();
+        board.getNodes().get(index-1).setNodeType(NodeType.NONE);
+        if (nodeType == NodeType.BLACK)
+        {
+            board.setNumberOfBlackPiecesOnBoard(board.getNumberOfBlackPiecesOnBoard()-1);
+        }
+        else
+        {
+            board.setNumberOfWhitePiecesOnBoard(board.getNumberOfWhitePiecesOnBoard()-1);
+        }
+    }
+
+    @Override
+    public void undoMove(Board board) {
+        int index = getCapturedNodeIndex();
+        NodeType nodeType = getCapturedNodeType();
+        board.getNodes().get(index-1).setNodeType(nodeType);
+        if (nodeType == NodeType.BLACK)
+        {
+            board.setNumberOfBlackPiecesOnBoard(board.getNumberOfBlackPiecesOnBoard()+1);
+        }
+        else
+        {
+            board.setNumberOfWhitePiecesOnBoard(board.getNumberOfWhitePiecesOnBoard()+1);
+        }
+
+    }
+
     public int getCapturedNodeIndex() {
         return capturedNodeIndex;
     }

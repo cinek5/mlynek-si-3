@@ -1,5 +1,6 @@
 package logic.moves;
 
+import logic.Board;
 import logic.NodeType;
 
 /**
@@ -38,5 +39,23 @@ public abstract class ChangePieceLocationMove implements Move {
 
     public void setNodeType(NodeType nodeType) {
         this.nodeType = nodeType;
+    }
+
+    @Override
+    public void makeMove(Board board)
+    {
+        int fromIndex = getFromNodeIndex();
+        int toIndex = getToNodeIndex();
+        board.getNodes().get(fromIndex-1).setNodeType(NodeType.NONE);
+        board.getNodes().get(toIndex-1).setNodeType( getNodeType() );
+    }
+
+    @Override
+    public void undoMove(Board board)
+    {
+        int fromIndex = getFromNodeIndex();
+        int toIndex = getToNodeIndex();
+        board.getNodes().get(fromIndex-1).setNodeType( getNodeType() );
+        board.getNodes().get(toIndex-1).setNodeType( NodeType.NONE );
     }
 }

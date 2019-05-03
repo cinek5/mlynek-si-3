@@ -63,58 +63,46 @@ public class Board {
         return nodes.get(index-1);
     }
 
-    public void makeMove(Move move) {
-        if (move instanceof PlacingMove) {
-            makePlacingMove((PlacingMove) move);
-        }
-        if (move instanceof CapturingMove) {
-            makeCapturingMove((CapturingMove) move);
-        }
-        if (move instanceof ChangePieceLocationMove)
-        {
-            makeChangingPlaceMove((ChangePieceLocationMove) move);
-        }
-    }
 
-    private void makePlacingMove(PlacingMove move) {
-        int index = move.getNodeIndex();
-        NodeType nodeType = move.getNodeType();
-        nodes.get(index-1).setNodeType(nodeType);
-
-        if (nodeType == NodeType.BLACK)
-        {
-            numberOfBlackPiecesToBePlaced--;
-            numberOfBlackPiecesOnBoard++;
-        }
-        else
-        {
-            numberOfWhitePiecesToBePlaced--;
-            numberOfWhitePiecesOnBoard++;
-        }
-
-    }
-    private void makeChangingPlaceMove(ChangePieceLocationMove move)
-    {
-        int fromIndex = move.getFromNodeIndex();
-        int toIndex = move.getToNodeIndex();
-        nodes.get(fromIndex).setNodeType(NodeType.NONE);
-        nodes.get(toIndex).setNodeType( move.getNodeType() );
-
-    }
-
-    private void makeCapturingMove(CapturingMove move) {
-        int index = move.getCapturedNodeIndex();
-        NodeType nodeType = move.getCapturedNodeType();
-        nodes.get(index-1).setNodeType(NodeType.NONE);
-        if (nodeType == NodeType.BLACK)
-        {
-            numberOfBlackPiecesOnBoard--;
-        }
-        else
-        {
-            numberOfWhitePiecesOnBoard--;
-        }
-    }
+//    private void makePlacingMove(PlacingMove move) {
+//        int index = move.getNodeIndex();
+//        NodeType nodeType = move.getNodeType();
+//        nodes.get(index-1).setNodeType(nodeType);
+//
+//        if (nodeType == NodeType.BLACK)
+//        {
+//            numberOfBlackPiecesToBePlaced--;
+//            numberOfBlackPiecesOnBoard++;
+//        }
+//        else
+//        {
+//            numberOfWhitePiecesToBePlaced--;
+//            numberOfWhitePiecesOnBoard++;
+//        }
+//
+//    }
+//    private void makeChangingPlaceMove(ChangePieceLocationMove move)
+//    {
+//        int fromIndex = move.getFromNodeIndex();
+//        int toIndex = move.getToNodeIndex();
+//        nodes.get(fromIndex-1).setNodeType(NodeType.NONE);
+//        nodes.get(toIndex-1).setNodeType( move.getNodeType() );
+//
+//    }
+//
+//    private void makeCapturingMove(CapturingMove move) {
+//        int index = move.getCapturedNodeIndex();
+//        NodeType nodeType = move.getCapturedNodeType();
+//        nodes.get(index-1).setNodeType(NodeType.NONE);
+//        if (nodeType == NodeType.BLACK)
+//        {
+//            numberOfBlackPiecesOnBoard--;
+//        }
+//        else
+//        {
+//            numberOfWhitePiecesOnBoard--;
+//        }
+//    }
 
     public boolean isPlayerBlocked(NodeType playerNodeType)
     {
@@ -131,7 +119,7 @@ public class Board {
 
                 for (int adj : node.getAdjacentNodesIndexes())
                 {
-                    if (getNode(adj).isOccupied())
+                    if (nodes.get(adj).isOccupied())
                     {
                         occupiedAdj++;
                     }
@@ -141,6 +129,10 @@ public class Board {
                     blockedNodes++;
                 }
             }
+        }
+        if (totalNodes==0)
+        {
+            return false;
         }
         return totalNodes == blockedNodes;
     }
@@ -164,6 +156,38 @@ public class Board {
 
     public int getNumberOfBlackPiecesToBePlaced() {
         return numberOfBlackPiecesToBePlaced;
+    }
+
+    public List<Node> getNodes() {
+        return nodes;
+    }
+
+    public void setNodes(List<Node> nodes) {
+        this.nodes = nodes;
+    }
+
+    public List<Line> getLines() {
+        return lines;
+    }
+
+    public void setLines(List<Line> lines) {
+        this.lines = lines;
+    }
+
+    public void setNumberOfWhitePiecesToBePlaced(int numberOfWhitePiecesToBePlaced) {
+        this.numberOfWhitePiecesToBePlaced = numberOfWhitePiecesToBePlaced;
+    }
+
+    public void setNumberOfBlackPiecesToBePlaced(int numberOfBlackPiecesToBePlaced) {
+        this.numberOfBlackPiecesToBePlaced = numberOfBlackPiecesToBePlaced;
+    }
+
+    public void setNumberOfWhitePiecesOnBoard(int numberOfWhitePiecesOnBoard) {
+        this.numberOfWhitePiecesOnBoard = numberOfWhitePiecesOnBoard;
+    }
+
+    public void setNumberOfBlackPiecesOnBoard(int numberOfBlackPiecesOnBoard) {
+        this.numberOfBlackPiecesOnBoard = numberOfBlackPiecesOnBoard;
     }
 
     private void createLines() {

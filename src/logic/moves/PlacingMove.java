@@ -28,6 +28,45 @@ public class PlacingMove implements  Move{
         }
     }
 
+    @Override
+    public void makeMove(Board board) {
+        int index = getNodeIndex();
+        NodeType nodeType = getNodeType();
+        board.getNodes().get(index-1).setNodeType(nodeType);
+
+        if (nodeType == NodeType.BLACK)
+        {
+            board.setNumberOfBlackPiecesToBePlaced(board.getNumberOfBlackPiecesToBePlaced()-1);
+            board.setNumberOfBlackPiecesOnBoard(board.getNumberOfBlackPiecesOnBoard()+1);
+
+        }
+        else
+        {
+            board.setNumberOfWhitePiecesToBePlaced(board.getNumberOfWhitePiecesToBePlaced()-1);
+            board.setNumberOfWhitePiecesOnBoard(board.getNumberOfWhitePiecesOnBoard()+1);
+        }
+    }
+
+    @Override
+    public void undoMove(Board board) {
+        int index = getNodeIndex();
+        NodeType nodeType = getNodeType();
+        board.getNodes().get(index-1).setNodeType(NodeType.NONE);
+
+        if (nodeType == NodeType.BLACK)
+        {
+            board.setNumberOfBlackPiecesToBePlaced(board.getNumberOfBlackPiecesToBePlaced()+1);
+            board.setNumberOfBlackPiecesOnBoard(board.getNumberOfBlackPiecesOnBoard()-1);
+
+        }
+        else
+        {
+            board.setNumberOfWhitePiecesToBePlaced(board.getNumberOfWhitePiecesToBePlaced()+1);
+            board.setNumberOfWhitePiecesOnBoard(board.getNumberOfWhitePiecesOnBoard()-1);
+        }
+
+    }
+
 
     public NodeType getNodeType() {
         return nodeType;

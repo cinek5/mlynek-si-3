@@ -11,6 +11,8 @@ import sample.Controller;
 public interface Move {
 
     boolean isLegal(GameController controller, NodeType playerTurn);
+    void makeMove(Board board);
+    void undoMove(Board board);
 
 }
 
