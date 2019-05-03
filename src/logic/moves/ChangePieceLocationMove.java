@@ -31,4 +31,12 @@ public abstract class ChangePieceLocationMove implements Move {
     public void setToNodeIndex(int toNodeIndex) {
         this.toNodeIndex = toNodeIndex;
     }
+
+    public NodeType getNodeType() {
+        return nodeType;
+    }
+
+    public void setNodeType(NodeType nodeType) {
+        this.nodeType = nodeType;
+    }
 }

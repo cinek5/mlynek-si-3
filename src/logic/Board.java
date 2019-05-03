@@ -1,9 +1,7 @@
 package logic;
 
-import logic.moves.CapturingMove;
-import logic.moves.Move;
-import logic.moves.MovingMove;
-import logic.moves.PlacingMove;
+import javafx.scene.control.TextFormatter;
+import logic.moves.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,6 +70,10 @@ public class Board {
         if (move instanceof CapturingMove) {
             makeCapturingMove((CapturingMove) move);
         }
+        if (move instanceof ChangePieceLocationMove)
+        {
+            makeChangingPlaceMove((ChangePieceLocationMove) move);
+        }
     }
 
     private void makePlacingMove(PlacingMove move) {
@@ -91,11 +93,19 @@ public class Board {
         }
 
     }
+    private void makeChangingPlaceMove(ChangePieceLocationMove move)
+    {
+        int fromIndex = move.getFromNodeIndex();
+        int toIndex = move.getToNodeIndex();
+        nodes.get(fromIndex).setNodeType(NodeType.NONE);
+        nodes.get(toIndex).setNodeType( move.getNodeType() );
+
+    }
 
     private void makeCapturingMove(CapturingMove move) {
         int index = move.getCapturedNodeIndex();
         NodeType nodeType = move.getCapturedNodeType();
-        nodes.get(index-1).setNodeType(null);
+        nodes.get(index-1).setNodeType(NodeType.NONE);
         if (nodeType == NodeType.BLACK)
         {
             numberOfBlackPiecesOnBoard--;
@@ -106,11 +116,37 @@ public class Board {
         }
     }
 
+    public boolean isPlayerBlocked(NodeType playerNodeType)
+    {
+        int totalNodes = 0;
+        int blockedNodes = 0;
 
+        for (Node node: nodes)
+        {
+            if (node.getNodeType()==playerNodeType)
+            {
+                totalNodes++;
 
+                int occupiedAdj = 0;
 
-    private void makeMovingMove(MovingMove move) {
+                for (int adj : node.getAdjacentNodesIndexes())
+                {
+                    if (getNode(adj).isOccupied())
+                    {
+                        occupiedAdj++;
+                    }
+                }
+                if (occupiedAdj == node.getAdjacentNodesIndexes().size())
+                {
+                    blockedNodes++;
+                }
+            }
+        }
+        return totalNodes == blockedNodes;
     }
+
+
+
 
     public int countMills(NodeType nodeType) {
         int numberOfMills = 0;

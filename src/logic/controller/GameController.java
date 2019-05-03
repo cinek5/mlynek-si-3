@@ -91,24 +91,24 @@ public class GameController {
 
 
 
-            switchPlayerTurn();
+            int mills = board.countMills(playerTurn);
 
-
-
-            int blackMills = board.countMills(NodeType.BLACK);
-            int whiteMills = board.countMills(NodeType.WHITE);
-
-            if (blackMills>0)
+            if (mills>0)
             {
-                System.out.println("mlynek dla czarnucha");
-                playerTurn = NodeType.BLACK;
+                System.out.println("MLYNEK");
             }
-            if (whiteMills>0)
+            else
             {
-                System.out.println("mlynek dla białasa");
-                playerTurn = NodeType.WHITE;
+                switchPlayerTurn();
             }
-            wasMillInPreviousTurn = blackMills>0 || whiteMills>0;
+
+
+
+
+
+
+
+            wasMillInPreviousTurn = mills>0;
 
 
 
@@ -118,6 +118,18 @@ public class GameController {
         }
 
 
+    }
+
+    public boolean hasLostByPiecesCapture(NodeType nodeType)
+    {
+        if (nodeType == NodeType.WHITE)
+        {
+            return board.getNumberOfWhitePiecesToBePlaced()==0 && board.getNumberOfWhitePiecesOnBoard()<=2;
+        }
+        else
+        {
+            return board.getNumberOfBlackPiecesToBePlaced()==0 && board.getNumberOfBlackPiecesOnBoard()<=2;
+        }
     }
 
     public boolean wasNodeHereInPreviousMove(NodeType nodeType, int index) {
@@ -200,7 +212,14 @@ public class GameController {
 
     private boolean isSlidingPhase()
     {
-        return board.getNumberOfBlackPiecesToBePlaced()==0 && board.getNumberOfWhitePiecesToBePlaced()==0;
+        if (playerTurn==NodeType.BLACK)
+        {
+            return board.getNumberOfBlackPiecesOnBoard()==0;
+        }
+        else
+        {
+            return board.getNumberOfWhitePiecesOnBoard()==0;
+        }
     }
 
     private void switchPlayerTurn()
@@ -209,6 +228,33 @@ public class GameController {
     }
 
     private boolean someoneWon() {
+        if (hasLostByPiecesCapture(NodeType.BLACK))
+        {
+           System.out.println("WHITE HAS WON! Black has too few pieces.");
+           return true;
+        }
+        if (hasLostByPiecesCapture(NodeType.WHITE))
+        {
+            System.out.println("BLACK HAS WON!!! White has too few pieces.");
+            return true;
+        }
+
+        if (isBlocked(NodeType.BLACK))
+        {
+            System.out.println("White has won! Black is blocked.");
+            return true;
+        }
+        if (isBlocked(NodeType.WHITE))
+        {
+            System.out.println("Black has won! White is blocked.");
+            return true;
+        }
+
         return false;
+    }
+
+    private boolean isBlocked(NodeType nodeType)
+    {
+        return board.isPlayerBlocked(nodeType);
     }
 }

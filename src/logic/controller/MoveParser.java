@@ -22,15 +22,15 @@ public class MoveParser {
 
     public MovingMove parseMovingMove(String line, NodeType nodeType) {
         Scanner reader = new Scanner(line);
-        int fromIndex = reader.nextInt();
-        int toIndex = reader.nextInt();
+        int fromIndex = Integer.parseInt(reader.next());
+        int toIndex = Integer.parseInt(reader.next());
         return new MovingMove(fromIndex, toIndex, nodeType);
     }
 
     public SlidingMove parseSlidingMove(String line, NodeType nodeType) {
         Scanner reader = new Scanner(line);
-        int fromIndex = reader.nextInt();
-        int toIndex = reader.nextInt();
+        int fromIndex = Integer.parseInt(reader.next());
+        int toIndex = Integer.parseInt(reader.next());
         return new SlidingMove(fromIndex, toIndex, nodeType);
     }
 

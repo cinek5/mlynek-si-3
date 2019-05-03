@@ -57,6 +57,11 @@ public class Node {
         this.adjacentNodesIndexes = adjacentNodesIndexes;
     }
 
+    public boolean isOccupied()
+    {
+        return nodeType!=NodeType.NONE;
+    }
+
     @Override
     public String toString() {
         if (nodeType==NodeType.WHITE) return " W";
