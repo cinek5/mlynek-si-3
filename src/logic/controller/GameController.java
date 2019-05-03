@@ -1,18 +1,20 @@
 package logic.controller;
 
-import logic.Board;
-import logic.NodeType;
-import logic.Phase;
-import logic.Utils;
+import logic.*;
 import logic.moves.*;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 /**
  * Created by Cinek on 24.04.2019.
  */
 public class GameController {
+    private static final int BOARD_NUMBER_OF_PIECES=24;
+
     private Queue<Move> movesHistoryWhite;
     private Queue<Move> movesHistoryBlack;
     private NodeType playerTurn;
@@ -119,6 +121,86 @@ public class GameController {
         }
 
 
+    }
+
+    public List<Move> generatePossibleMoves()
+    {
+        return null;
+    }
+
+    public List<Move> generatePossiblePlacingMoves(NodeType playerNodeType)
+    {
+        List<Move> moves = new ArrayList<>();
+        for (int i=1; i<=BOARD_NUMBER_OF_PIECES; i++)
+        {
+            if (board.getNodes().get(i-1).getNodeType()==NodeType.NONE)
+            {
+                moves.add(new PlacingMove(i, playerNodeType));
+            }
+        }
+        return moves;
+    }
+
+    public List<Move> generatePossibleCapturingMoves(NodeType playerNodeType)
+    {
+        List<Move> moves = new ArrayList<>();
+        NodeType oppositeNodeType = Utils.getOppositeNodeType(playerNodeType);
+        for (int i=1; i<=BOARD_NUMBER_OF_PIECES; i++)
+        {
+            if (board.getNodes().get(i-1).getNodeType()==oppositeNodeType)
+            {
+                moves.add(new CapturingMove(i,oppositeNodeType ));
+            }
+        }
+        return moves;
+    }
+    public List<Move> generatePossibleSlidingMoves(NodeType playerNodeType)
+    {
+        List<Move> moves = new ArrayList<>();
+        List<Node> playerNodes = board.getNodes().stream().filter(node -> node.getNodeType()==playerNodeType)
+                .collect(Collectors.toList());
+        for (Node node: playerNodes)
+        {
+            for (int index: node.getAdjacentNodesIndexes())
+            {
+                if (!board.getNodes().get(index).isOccupied())
+                {
+                    int fromIndex = node.getIndex();
+                    int toIndex = index+1;
+
+                    if (!wasNodeHereInPreviousMove(playerNodeType, toIndex))
+                    {
+                        moves.add(new SlidingMove(fromIndex, toIndex, playerNodeType));
+                    }
+                }
+            }
+        }
+
+        return moves;
+
+    }
+
+    public List<Move> generatePossibleMovingMoves(NodeType playerNodeType)
+    {
+        List<Move> moves = new ArrayList<>();
+        List<Node> playerNodes = board.getNodes().stream().filter( node -> node.getNodeType()==playerNodeType)
+                .collect(Collectors.toList());Collectors.toList();
+
+        List<Integer> freeNodeIndexes = board.getNodes().stream().filter(node->node.getNodeType()==NodeType.NONE)
+                .map( node -> node.getIndex()).collect(Collectors.toList());
+
+        for (Node node: playerNodes)
+        {
+            for (Integer toIndex : freeNodeIndexes)
+            {
+                int fromIndex = node.getIndex();
+                if (!wasNodeHereInPreviousMove(playerNodeType, toIndex))
+                {
+                    moves.add(new MovingMove(fromIndex, toIndex, playerNodeType));
+                }
+            }
+        }
+        return moves;
     }
 
     public boolean hasLostByPiecesCapture(NodeType nodeType)
