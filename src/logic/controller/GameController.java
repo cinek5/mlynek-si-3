@@ -42,10 +42,6 @@ public class GameController {
         return playerTurn;
     }
 
-    public Phase getGamePhase() {
-        return gamePhase;
-    }
-
     public boolean isWasMillInPreviousTurn() {
         return wasMillInPreviousTurn;
     }
@@ -123,7 +119,7 @@ public class GameController {
 
     }
 
-    public List<Move> generatePossibleMoves()
+    public List<Move> generatePossibleMoves(NodeType playerNodeType)
     {
         return null;
     }
@@ -267,11 +263,18 @@ public class GameController {
 
     private Phase setGamePhase()
     {
-        if (isMovingFreelyForPlayer(playerTurn))
+      gamePhase = getGamePhase(playerTurn);
+      return gamePhase;
+    }
+
+    public Phase getGamePhase(NodeType nodeType)
+    {
+        Phase gamePhase=null;
+        if (isMovingFreelyForPlayer(nodeType))
         {
             gamePhase = Phase.PLACING;
         }
-        else if (isSlidingPhase())
+        else if (isSlidingPhaseFor(nodeType))
         {
             gamePhase = Phase.SLIDING;
         }
@@ -280,6 +283,7 @@ public class GameController {
             gamePhase = Phase.PLACING;
         }
         return gamePhase;
+
     }
     private boolean isMovingFreelyForPlayer(NodeType playerTurn)
     {
@@ -295,7 +299,12 @@ public class GameController {
 
     private boolean isSlidingPhase()
     {
-        if (playerTurn==NodeType.BLACK)
+       return isSlidingPhaseFor(playerTurn);
+    }
+
+    private boolean isSlidingPhaseFor(NodeType player)
+    {
+        if (player==NodeType.BLACK)
         {
             return board.getNumberOfBlackPiecesToBePlaced()==0;
         }
