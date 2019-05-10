@@ -61,56 +61,7 @@ public class GameController {
     public void game() {
         while (!someoneWon()) {
 
-            board.printBoard();
-
-            setGamePhase();
-            System.out.println(gamePhase);
-
-            boolean validMove = false;
-            Move nextMove = null;
-
-            System.out.println("Ruch gracza: "+playerTurn);
-            while(!validMove) {
-                if (playerTurn == NodeType.WHITE) {
-                    nextMove = whiteInput.getMove(this);
-
-                } else {
-                    nextMove = blackInput.getMove(this);
-                }
-                if (nextMove.isLegal(this, playerTurn))
-                {
-                    validMove = true;
-                }
-            }
-
-            nextMove.makeMove(board);
-
-
-            saveMove(nextMove);
-
-
-
-            int mills = board.countMills(playerTurn);
-
-            if (mills>0)
-            {
-                System.out.println("MLYNEK");
-            }
-            else
-            {
-                switchPlayerTurn();
-            }
-
-
-
-
-
-
-
-            wasMillInPreviousTurn = mills>0;
-
-
-
+            playSingleTurn();
 
 
 
@@ -119,8 +70,121 @@ public class GameController {
 
     }
 
+    public void playSingleTurn()
+    {
+        board.printBoard();
+
+        setGamePhase();
+        System.out.println(gamePhase);
+
+        boolean validMove = false;
+        Move nextMove = null;
+
+        System.out.println("Ruch gracza: "+playerTurn);
+        while(!validMove) {
+            if (playerTurn == NodeType.WHITE) {
+                nextMove = whiteInput.getMove(this);
+
+            } else {
+                nextMove = blackInput.getMove(this);
+            }
+            if (nextMove.isLegal(this, playerTurn))
+            {
+                validMove = true;
+            }
+        }
+
+        nextMove.makeMove(board);
+
+
+        saveMove(nextMove);
+
+
+
+        int mills = board.countMills(playerTurn);
+
+        if (mills>0)
+        {
+            System.out.println("MLYNEK: "+mills);
+        }
+        else
+        {
+            switchPlayerTurn();
+        }
+
+
+        wasMillInPreviousTurn = mills>0;
+
+
+
+    }
+
+    public GameStateHelper playMove(Move move)
+    {
+
+        setGamePhase();
+
+
+
+        GameStateHelper gameStateHelper = new GameStateHelper(playerTurn, wasMillInPreviousTurn,
+                lastNonCapturingMoveForWhite, lastNonCapturingMoveForBlack);
+
+        move.makeMove(board);
+
+
+        int mills = board.countMills(playerTurn);
+
+        if (mills==0)
+        {
+            switchPlayerTurn();
+        }
+
+
+        wasMillInPreviousTurn = mills>0;
+
+
+        return gameStateHelper;
+
+
+
+    }
+
+    public void undoMove(Move move, GameStateHelper stateBeforeMoveWasMade)
+    {
+        move.undoMove(board);
+
+        this.lastNonCapturingMoveForWhite = stateBeforeMoveWasMade.lastNonCapturingMoveForWhite;
+        this.lastNonCapturingMoveForBlack = stateBeforeMoveWasMade.lastNonCapturingMoveForBlack;
+        this.playerTurn = stateBeforeMoveWasMade.playerTurn;
+        this.wasMillInPreviousTurn = stateBeforeMoveWasMade.wasMill;
+
+    }
+
+
     public List<Move> generatePossibleMoves(NodeType playerNodeType)
     {
+       Phase phase = getGamePhase(playerNodeType);
+
+       if (isWasMillInPreviousTurn())
+       {
+           return generatePossibleCapturingMoves(playerNodeType);
+       }
+
+       if (phase.equals(Phase.PLACING))
+       {
+           return generatePossiblePlacingMoves(playerNodeType);
+       }
+
+       if (phase.equals(Phase.SLIDING))
+       {
+           return generatePossibleSlidingMoves(playerNodeType);
+       }
+
+       if (phase.equals(Phase.MOVING_FREELY))
+       {
+           return generatePossibleMovingMoves(playerNodeType);
+       }
+
         return null;
     }
 
@@ -145,7 +209,10 @@ public class GameController {
         {
             if (board.getNodes().get(i-1).getNodeType()==oppositeNodeType)
             {
-                moves.add(new CapturingMove(i,oppositeNodeType ));
+                Move move = new CapturingMove(i, oppositeNodeType);
+                if (move.isLegal(this,playerNodeType)) {
+                    moves.add(move);
+                }
             }
         }
         return moves;
@@ -164,7 +231,7 @@ public class GameController {
                     int fromIndex = node.getIndex();
                     int toIndex = index+1;
 
-                    if (!wasNodeHereInPreviousMove(playerNodeType, toIndex))
+                    if (!wasNodeHereInPreviousMove(playerNodeType, toIndex, fromIndex))
                     {
                         moves.add(new SlidingMove(fromIndex, toIndex, playerNodeType));
                     }
@@ -190,7 +257,7 @@ public class GameController {
             for (Integer toIndex : freeNodeIndexes)
             {
                 int fromIndex = node.getIndex();
-                if (!wasNodeHereInPreviousMove(playerNodeType, toIndex))
+                if (!wasNodeHereInPreviousMove(playerNodeType, toIndex, fromIndex))
                 {
                     moves.add(new MovingMove(fromIndex, toIndex, playerNodeType));
                 }
@@ -211,7 +278,7 @@ public class GameController {
         }
     }
 
-    public boolean wasNodeHereInPreviousMove(NodeType nodeType, int index) {
+    public boolean wasNodeHereInPreviousMove(NodeType nodeType, int toIndex, int fromIndex) {
         Move previousMove;
         if (nodeType == NodeType.BLACK) {
             previousMove = lastNonCapturingMoveForBlack;
@@ -223,17 +290,23 @@ public class GameController {
         {
             return false;
         }
-        int lastIndex = -1;
+        int lastFromIndex = -1;
+        int lastToIndex = -1;
         if (previousMove instanceof PlacingMove)
         {
-            lastIndex = ((PlacingMove) previousMove).getNodeIndex();
+            lastFromIndex = ((PlacingMove) previousMove).getNodeIndex();
+            return lastFromIndex==toIndex;
         }
         if (previousMove instanceof ChangePieceLocationMove)
         {
-            lastIndex = ((ChangePieceLocationMove)previousMove).getFromNodeIndex();
+            ChangePieceLocationMove prvMove = (ChangePieceLocationMove) previousMove;
+            lastFromIndex = prvMove.getFromNodeIndex();
+            lastToIndex = prvMove.getToNodeIndex();
+
+            return lastFromIndex==toIndex && lastToIndex == fromIndex;
         }
 
-        return lastIndex==index;
+        return false;
 
 
     }
@@ -348,5 +421,21 @@ public class GameController {
     private boolean isBlocked(NodeType nodeType)
     {
         return board.isPlayerBlocked(nodeType);
+    }
+
+
+    public static class GameStateHelper
+    {
+        NodeType playerTurn;
+        boolean wasMill;
+        Move lastNonCapturingMoveForWhite;
+        Move lastNonCapturingMoveForBlack;
+
+        public GameStateHelper(NodeType playerTurn, boolean wasMill, Move lastNonCapturingMoveForWhite, Move lastNonCapturingMoveForBlack) {
+            this.playerTurn = playerTurn;
+            this.wasMill = wasMill;
+            this.lastNonCapturingMoveForWhite = lastNonCapturingMoveForWhite;
+            this.lastNonCapturingMoveForBlack = lastNonCapturingMoveForBlack;
+        }
     }
 }

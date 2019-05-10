@@ -3,6 +3,7 @@ package logic.evaluation;
 import logic.Node;
 import logic.NodeType;
 import logic.Phase;
+import logic.Utils;
 import logic.controller.GameController;
 
 import java.util.List;
@@ -22,15 +23,16 @@ public class FirstGameStateEvaluator implements GameStateEvaluator {
         int numOfWhites = countNodesOfType(nodes, NodeType.WHITE);
         int numOfBlacks = countNodesOfType(nodes, NodeType.BLACK);
 
-
+        int countMills = gameController.getBoard().countMills(playerTurn);
+        int oppositeMills = gameController.getBoard().countMills(Utils.getOppositeNodeType(playerTurn));
 
         if (playerTurn.equals(NodeType.BLACK))
         {
-            return numOfBlacks - numOfWhites;
+            return numOfBlacks - numOfWhites +50*countMills - 220000*oppositeMills;
         }
         else
         {
-            return numOfWhites - numOfBlacks;
+            return numOfWhites - numOfBlacks + 50*countMills - 220000*oppositeMills;
         }
 
     }

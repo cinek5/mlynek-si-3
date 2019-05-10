@@ -1,5 +1,6 @@
 package logic;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,8 +9,13 @@ import java.util.List;
 public class Node {
     private int index;
     private NodeType nodeType;
-    private Position position;
+    private List<Line> lines;
     private List<Integer> adjacentNodesIndexes;
+
+
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_RESET = "\u001B[0m";
 
 
 
@@ -17,28 +23,26 @@ public class Node {
     public Node(int index) {
         this.index = index;
         this.nodeType = NodeType.NONE;
+        lines = new ArrayList<>(3);
+
     }
 
-    public Node(int index, int x, int y) {
-        this(index);
-        Position position = new Position(x,y);
-        this.position = position;
+    public List<Line> getLines() {
+        return lines;
+    }
+
+    public void addLine(Line line)
+    {
+        this.lines.add(line);
     }
 
     public int getIndex() {
         return index;
     }
 
+
     public void setIndex(int index) {
         this.index = index;
-    }
-
-    public Position getPosition() {
-        return position;
-    }
-
-    public void setPosition(Position position) {
-        this.position = position;
     }
 
     public void setNodeType(NodeType nodeType) {
@@ -64,9 +68,10 @@ public class Node {
 
     @Override
     public String toString() {
-        if (nodeType==NodeType.WHITE) return " W";
-        else if (nodeType==NodeType.BLACK) return " B";
-        else return String.format("%2d", index);
+        String ind = String.format("%2d", index);
+        if (nodeType==NodeType.WHITE) return ANSI_YELLOW+ind+ANSI_RESET;
+        else if (nodeType==NodeType.BLACK) return ANSI_BLUE+ind+ANSI_RESET;
+        else return ind;
     }
 
 

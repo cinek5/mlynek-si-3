@@ -16,7 +16,7 @@ public class SlidingMove extends ChangePieceLocationMove{
 
     @Override
     public boolean isLegal(GameController controller, NodeType playerTurn) {
-        return !controller.wasNodeHereInPreviousMove(playerTurn, getToNodeIndex()) &&
+        return !controller.wasNodeHereInPreviousMove(playerTurn, getToNodeIndex(), getFromNodeIndex()) &&
                 controller.getBoard().getNode(getToNodeIndex()).getNodeType() == NodeType.NONE &&
                 controller.getBoard().getNode(getFromNodeIndex()).getNodeType() == playerTurn &&
                 areNodesAdjacent(controller);

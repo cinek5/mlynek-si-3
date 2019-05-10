@@ -36,7 +36,7 @@ public class PlayerInput implements GameInput {
         }
         else
         {
-            Phase gamePhase = controller.getGamePhase();
+            Phase gamePhase = controller.getGamePhase(nodeType);
             if (gamePhase == Phase.PLACING)
             {
                 return  moveParser.parsePlacingMove(line, nodeType);

@@ -15,8 +15,11 @@ public class CapturingMove implements Move {
 
     @Override
     public boolean isLegal(GameController controller, NodeType playerTurn) {
-        boolean isNodeOppositeColor = controller.getBoard().getNode(capturedNodeIndex).getNodeType()==capturedNodeType;
-        return isNodeOppositeColor;
+        Node node = controller.getBoard().getNode(capturedNodeIndex);
+        boolean isNodeOppositeColor = node.getNodeType()==capturedNodeType;
+        boolean isInMill = node.getLines().stream()
+                .filter(line -> line.wasMill(capturedNodeType)).findAny().isPresent();
+        return isNodeOppositeColor && !isInMill;
     }
 
     @Override
