@@ -8,8 +8,7 @@ public class Line {
     private Node node1;
     private Node node2;
     private Node node3;
-    private boolean wasMill;
-
+    private boolean millUsed;
     public Line(Node node1, Node node2, Node node3) {
         this.node1 = node1;
         node1.addLine(this);
@@ -17,20 +16,45 @@ public class Line {
         node2.addLine(this);
         this.node3 = node3;
         node3.addLine(this);
-        wasMill = false;
     }
 
 
-    public boolean isMill(NodeType nodeType) {
-        boolean isNewMill = !wasMill;
-        boolean isMill = isNewMill && node1.getNodeType() == nodeType && node2.getNodeType() == nodeType && node3.getNodeType() == nodeType;
-        wasMill = wasMill(NodeType.BLACK) || wasMill(NodeType.WHITE);
-        return isMill;
-
+    public boolean checkMill(NodeType nodeType) {
+        return checkMill() && node1.getNodeType() == nodeType;
     }
 
-    public boolean wasMill(NodeType nodeType)
+    public void setMillUsed()
     {
-        return node1.getNodeType() == nodeType && node2.getNodeType() == nodeType && node3.getNodeType() == nodeType;
+        millUsed = true;
+    }
+
+    public boolean isMillUsed()
+    {
+        return millUsed;
+    }
+
+    public boolean checkMill() {
+        boolean hasMill = hasMill();
+        if (!hasMill) {
+            millUsed = false;
+        }
+
+        return hasMill;
+    }
+
+    public boolean hasMill(NodeType nodeType)
+    {
+        return hasMill() && node1.getNodeType() == nodeType;
+
+    }
+
+    private boolean hasMill()
+    {
+        boolean hasMill = node1.getNodeType() != NodeType.NONE &&
+                node1.getNodeType() == node2.getNodeType() &&
+                node2.getNodeType() == node3.getNodeType();
+
+        return hasMill;
+
     }
 }

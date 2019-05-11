@@ -1,6 +1,8 @@
 package logic.moves;
 
 import logic.Board;
+import logic.Line;
+import logic.Node;
 import logic.NodeType;
 
 /**
@@ -42,20 +44,36 @@ public abstract class ChangePieceLocationMove implements Move {
     }
 
     @Override
-    public void makeMove(Board board)
-    {
+    public void makeMove(Board board) {
         int fromIndex = getFromNodeIndex();
         int toIndex = getToNodeIndex();
-        board.getNodes().get(fromIndex-1).setNodeType(NodeType.NONE);
-        board.getNodes().get(toIndex-1).setNodeType( getNodeType() );
+        board.getNodes().get(fromIndex - 1).setNodeType(NodeType.NONE);
+        board.getNodes().get(toIndex - 1).setNodeType(getNodeType());
     }
 
     @Override
-    public void undoMove(Board board)
-    {
+    public void undoMove(Board board) {
         int fromIndex = getFromNodeIndex();
         int toIndex = getToNodeIndex();
-        board.getNodes().get(fromIndex-1).setNodeType( getNodeType() );
-        board.getNodes().get(toIndex-1).setNodeType( NodeType.NONE );
+        Node fromNode = board.getNodes().get(fromIndex - 1);
+        fromNode.setNodeType(getNodeType());
+        Node toNode = board.getNodes().get(toIndex - 1);
+        toNode.setNodeType(NodeType.NONE);
+
+        for (Line line : fromNode.getLines())
+        {
+            if ( line.checkMill()&& !line.isMillUsed() )
+            {
+                line.setMillUsed();
+            }
+        }
+        for (Line line : toNode.getLines())
+        {
+            if ( line.checkMill()&& !line.isMillUsed() )
+            {
+                line.setMillUsed();
+            }
+        }
     }
+
 }

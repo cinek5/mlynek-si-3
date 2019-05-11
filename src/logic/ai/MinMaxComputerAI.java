@@ -16,16 +16,18 @@ import java.util.List;
 public class MinMaxComputerAI implements ComputerAI {
 
 
-    private static  final int MAX_DEPTH = 4;
+
 
     private GameStateEvaluator gameStateEvaluator;
     private NodeType playerNodeType;
+    private int maxDepth;
 
 
-    public MinMaxComputerAI(GameStateEvaluator gameStateEvaluator, NodeType playerNodeType)
+    public MinMaxComputerAI(GameStateEvaluator gameStateEvaluator, NodeType playerNodeType, int depth)
     {
         this.gameStateEvaluator = gameStateEvaluator;
         this.playerNodeType = playerNodeType;
+        this.maxDepth = depth;
 
     }
 
@@ -55,7 +57,7 @@ public class MinMaxComputerAI implements ComputerAI {
 
             GameController.GameStateHelper gameState = gameController.playMove(move);
 
-            int val = minimax(gameController, 0, true);
+            int val = minimax(gameController, 0, true );
 
             if (val>bestVal)
             {
@@ -93,7 +95,7 @@ public class MinMaxComputerAI implements ComputerAI {
 
     private int minimax(GameController gameController, int depth, boolean isMaximizingPlayer)
     {
-        if (depth == MAX_DEPTH )
+        if (depth == maxDepth )
         {
             return evaluate(gameController, playerNodeType);
         }

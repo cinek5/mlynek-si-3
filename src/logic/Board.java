@@ -143,7 +143,8 @@ public class Board {
     public int countMills(NodeType nodeType) {
         int numberOfMills = 0;
         for (Line line : lines) {
-            if (line.isMill(nodeType)) {
+            if (line.checkMill(nodeType) && !line.isMillUsed() ) {
+                line.setMillUsed();
                 numberOfMills++;
             }
         }
@@ -195,7 +196,7 @@ public class Board {
                 // mill combinations for the outer box
                 new Line(nodes.get(0), nodes.get(1), nodes.get(2)),
                 new Line(nodes.get(0), nodes.get(9), nodes.get(21)),
-                new Line(nodes.get(0), nodes.get(14), nodes.get(23)),
+                new Line(nodes.get(2), nodes.get(14), nodes.get(23)),
                 new Line(nodes.get(21), nodes.get(22), nodes.get(23)),
 
                 // mill combinations for the middle box

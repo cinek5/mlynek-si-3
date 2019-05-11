@@ -1,6 +1,7 @@
 package logic.moves;
 
 import logic.Board;
+import logic.Line;
 import logic.Node;
 import logic.NodeType;
 import logic.controller.GameController;
@@ -18,7 +19,7 @@ public class CapturingMove implements Move {
         Node node = controller.getBoard().getNode(capturedNodeIndex);
         boolean isNodeOppositeColor = node.getNodeType()==capturedNodeType;
         boolean isInMill = node.getLines().stream()
-                .filter(line -> line.wasMill(capturedNodeType)).findAny().isPresent();
+                .filter(line -> line.hasMill(capturedNodeType)).findAny().isPresent();
         return isNodeOppositeColor && !isInMill;
     }
 
@@ -41,7 +42,18 @@ public class CapturingMove implements Move {
     public void undoMove(Board board) {
         int index = getCapturedNodeIndex();
         NodeType nodeType = getCapturedNodeType();
-        board.getNodes().get(index-1).setNodeType(nodeType);
+
+        Node node = board.getNodes().get(index-1);
+        node.setNodeType(nodeType);
+
+        for (Line line: node.getLines())
+        {
+             if ( line.checkMill()&& !line.isMillUsed() )
+             {
+                 line.setMillUsed();
+             }
+        }
+
         if (nodeType == NodeType.BLACK)
         {
             board.setNumberOfBlackPiecesOnBoard(board.getNumberOfBlackPiecesOnBoard()+1);

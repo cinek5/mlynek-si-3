@@ -1,9 +1,6 @@
 package logic.evaluation;
 
-import logic.Node;
-import logic.NodeType;
-import logic.Phase;
-import logic.Utils;
+import logic.*;
 import logic.controller.GameController;
 
 import java.util.List;
@@ -20,21 +17,28 @@ public class FirstGameStateEvaluator implements GameStateEvaluator {
 
         List<Node> nodes = gameController.getBoard().getNodes();
 
-        int numOfWhites = countNodesOfType(nodes, NodeType.WHITE);
-        int numOfBlacks = countNodesOfType(nodes, NodeType.BLACK);
+       // int numOfWhites = countNodesOfType(nodes, NodeType.WHITE);
+       // int numOfBlacks = countNodesOfType(nodes, NodeType.BLACK);
 
-        int countMills = gameController.getBoard().countMills(playerTurn);
-        int oppositeMills = gameController.getBoard().countMills(Utils.getOppositeNodeType(playerTurn));
+        int countMills = howManyMills(gameController.getBoard(), playerTurn);
+        int oppositeMills = howManyMills(gameController.getBoard(), Utils.getOppositeNodeType(playerTurn));
 
-        if (playerTurn.equals(NodeType.BLACK))
+        return 20*countMills - 10*oppositeMills;
+
+
+    }
+
+    private int howManyMills(Board board, NodeType nodeType)
+    {
+        int count = 0;
+        for (Line line : board.getLines())
         {
-            return numOfBlacks - numOfWhites +50*countMills - 220000*oppositeMills;
+            if (line.hasMill(nodeType))
+            {
+                count++;
+            }
         }
-        else
-        {
-            return numOfWhites - numOfBlacks + 50*countMills - 220000*oppositeMills;
-        }
-
+        return count;
     }
 
 

@@ -67,6 +67,8 @@ public class GameController {
 
         }
 
+        board.printBoard();
+
 
     }
 
@@ -75,23 +77,41 @@ public class GameController {
         board.printBoard();
 
         setGamePhase();
-        System.out.println(gamePhase);
+        if (!wasMillInPreviousTurn) {
+            System.out.println(gamePhase);
+        } else
+        {
+            System.out.println("CAPTURING ");
+        }
 
         boolean validMove = false;
         Move nextMove = null;
 
         System.out.println("Ruch gracza: "+playerTurn);
+        GameInput currentInput;
         while(!validMove) {
             if (playerTurn == NodeType.WHITE) {
-                nextMove = whiteInput.getMove(this);
-
+                currentInput = whiteInput;
             } else {
-                nextMove = blackInput.getMove(this);
+                currentInput = blackInput;
             }
-            if (nextMove.isLegal(this, playerTurn))
+
+            nextMove = currentInput.getMove(this);
+
+            if (currentInput instanceof  PlayerInput)
+            {
+                if (nextMove.isLegal(this, playerTurn))
+                {
+                    validMove = true;
+                }
+
+            }
+            else
             {
                 validMove = true;
             }
+
+
         }
 
         nextMove.makeMove(board);
@@ -122,12 +142,10 @@ public class GameController {
     public GameStateHelper playMove(Move move)
     {
 
-        setGamePhase();
-
-
-
         GameStateHelper gameStateHelper = new GameStateHelper(playerTurn, wasMillInPreviousTurn,
                 lastNonCapturingMoveForWhite, lastNonCapturingMoveForBlack);
+
+        setGamePhase();
 
         move.makeMove(board);
 
@@ -138,6 +156,7 @@ public class GameController {
         {
             switchPlayerTurn();
         }
+
 
 
         wasMillInPreviousTurn = mills>0;
@@ -167,7 +186,9 @@ public class GameController {
 
        if (isWasMillInPreviousTurn())
        {
-           return generatePossibleCapturingMoves(playerNodeType);
+           List<Move> moves = generatePossibleCapturingMoves(playerNodeType);
+           if (!moves.isEmpty())
+               return moves;
        }
 
        if (phase.equals(Phase.PLACING))
@@ -345,7 +366,7 @@ public class GameController {
         Phase gamePhase=null;
         if (isMovingFreelyForPlayer(nodeType))
         {
-            gamePhase = Phase.PLACING;
+            gamePhase = Phase.MOVING_FREELY;
         }
         else if (isSlidingPhaseFor(nodeType))
         {
@@ -362,15 +383,15 @@ public class GameController {
     {
         if (playerTurn == NodeType.WHITE)
         {
-            return isSlidingPhase() && board.getNumberOfWhitePiecesOnBoard()<=3;
+            return isSlidingPhase(playerTurn) && board.getNumberOfWhitePiecesOnBoard()<=3;
         }
         else
         {
-            return isSlidingPhase() && board.getNumberOfBlackPiecesOnBoard()<=3;
+            return isSlidingPhase(playerTurn) && board.getNumberOfBlackPiecesOnBoard()<=3;
         }
     }
 
-    private boolean isSlidingPhase()
+    private boolean isSlidingPhase(NodeType playerTurn)
     {
        return isSlidingPhaseFor(playerTurn);
     }
