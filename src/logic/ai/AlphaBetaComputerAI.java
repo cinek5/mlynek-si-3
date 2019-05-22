@@ -7,28 +7,30 @@ import logic.controller.GameController;
 import logic.evaluation.GameStateEvaluator;
 import logic.moves.Move;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+
+import static java.lang.Integer.max;
 
 /**
  * Created by Cinek on 07.05.2019.
  */
-public class MinMaxComputerAI implements ComputerAI {
+public class AlphaBetaComputerAI implements ComputerAI {
 
 
 
 
     private GameStateEvaluator gameStateEvaluator;
     private NodeType playerNodeType;
-    private int maxDepth;
-    private int nodesVisited = 0;
-
     private boolean isHeuristics = false;
+    private int maxDepth;
+    private int nodesVisited=0;
 
+    public int getNodesVisited()
+    {
+        return nodesVisited;
+    }
 
-    public MinMaxComputerAI(GameStateEvaluator gameStateEvaluator, NodeType playerNodeType, int depth, boolean isHeuristics)
+    public AlphaBetaComputerAI(GameStateEvaluator gameStateEvaluator, NodeType playerNodeType, int depth, boolean isHeuristics)
     {
         this.gameStateEvaluator = gameStateEvaluator;
         this.playerNodeType = playerNodeType;
@@ -37,7 +39,7 @@ public class MinMaxComputerAI implements ComputerAI {
 
     }
 
-    private void sortMoves(GameController gameController, List<Move> moves )
+    private void sortMoves(GameController gameController, List<Move> moves, boolean isMaximizing )
     {
         HashMap<Move,Integer> moveValues = new HashMap<>();
         for (Move move : moves)
@@ -57,7 +59,8 @@ public class MinMaxComputerAI implements ComputerAI {
         moves.sort(new Comparator<Move>() {
             @Override
             public int compare(Move o1, Move o2) {
-                return moveValues.get(o1) - moveValues.get(o2);
+                return isMaximizing? -1*(moveValues.get(o1) - moveValues.get(o2)) :
+                        moveValues.get(o1) - moveValues.get(o2);
             }
         });
     }
@@ -71,7 +74,12 @@ public class MinMaxComputerAI implements ComputerAI {
         {
             return null;
         }
-        nodesVisited++;
+            nodesVisited++;
+
+        if (isHeuristics) {
+            sortMoves(gameController, possibleMoves, true);
+        }
+
 
         Iterator<Move> movesIt = possibleMoves.iterator();
 
@@ -79,19 +87,18 @@ public class MinMaxComputerAI implements ComputerAI {
 
         GameController.GameStateHelper gameStateHelper = gameController.playMove( bestMove );
 
-        int bestVal = minimax(gameController, 0, true );
+        int bestVal = minimax(gameController, 0, true, Integer.MIN_VALUE, Integer.MAX_VALUE );
 
         gameController.undoMove( bestMove, gameStateHelper );
 
         while(movesIt.hasNext())
         {
-
-            nodesVisited++;
             Move move = movesIt.next();
+            nodesVisited++;
 
             GameController.GameStateHelper gameState = gameController.playMove(move);
 
-            int val = minimax(gameController, 0, true );
+            int val = minimax(gameController, 0, true, Integer.MIN_VALUE, Integer.MAX_VALUE );
 
             if (val>bestVal)
             {
@@ -105,11 +112,6 @@ public class MinMaxComputerAI implements ComputerAI {
 
 
         return bestMove;
-    }
-
-    @Override
-    public int getNodesVisited() {
-        return nodesVisited;
     }
 
     private int evaluate(GameController gameController, NodeType nodeType)
@@ -132,7 +134,7 @@ public class MinMaxComputerAI implements ComputerAI {
         return val;
     }
 
-    private int minimax(GameController gameController, int depth, boolean isMaximizingPlayer)
+    private int minimax(GameController gameController, int depth, boolean isMaximizingPlayer, int alpha, int beta)
     {
         nodesVisited++;
         if (depth == maxDepth )
@@ -149,20 +151,29 @@ public class MinMaxComputerAI implements ComputerAI {
             {
                 return bestVal;
             }
+
             if (isHeuristics)
             {
-                sortMoves(gameController,possibleMoves);
+                sortMoves(gameController,possibleMoves, true);
             }
 
             for (Move move: possibleMoves)
             {
                 GameController.GameStateHelper gameState = gameController.playMove(move);
 
-                int val = minimax(gameController, depth+1, false);
+                int val = minimax(gameController, depth+1, false, alpha, beta);
+
 
                 bestVal = Math.max(bestVal, val);
 
+                alpha = Math.max( alpha, bestVal);
+
                 gameController.undoMove(move, gameState);
+
+                if (beta<=alpha)
+                {
+                    break;
+                }
             }
 
 
@@ -179,25 +190,33 @@ public class MinMaxComputerAI implements ComputerAI {
 
             List<Move> possibleMoves = gameController.generatePossibleMoves(Utils.getOppositeNodeType(playerNodeType));
 
+            if (isHeuristics)
+            {
+                sortMoves(gameController, possibleMoves, false);
+
+            }
+
             if (possibleMoves.isEmpty())
             {
                 return bestVal;
-            }
-
-            if (isHeuristics)
-            {
-                sortMoves(gameController,possibleMoves);
             }
 
             for (Move move: possibleMoves)
             {
                 GameController.GameStateHelper gameState = gameController.playMove(move);
 
-                int val = minimax(gameController, depth+1, true);
+                int val = minimax(gameController, depth+1, true, alpha, beta);
 
                 bestVal = Math.min(bestVal, val);
 
+                beta = Math.min(bestVal, val);
+
                 gameController.undoMove(move, gameState);
+
+                if (beta<=alpha)
+                {
+                    break;
+                }
             }
 
 

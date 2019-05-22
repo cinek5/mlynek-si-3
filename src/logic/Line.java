@@ -57,4 +57,18 @@ public class Line {
         return hasMill;
 
     }
+
+    public  boolean isTwoPieceConfiguration(NodeType nodeType)
+    {
+        int numberOfPieces = 0;
+
+        if (node1.getNodeType()==nodeType)
+            numberOfPieces++;
+        if (node2.getNodeType()==nodeType)
+            numberOfPieces++;
+        if (node3.getNodeType()==nodeType)
+            numberOfPieces++;
+
+        return numberOfPieces==2;
+    }
 }

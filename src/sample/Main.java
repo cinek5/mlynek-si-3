@@ -7,12 +7,11 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/layout/start.fxml"));
-        primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 500, 500));
+        primaryStage.setTitle("Mlynek - Nowa Gra");
+        primaryStage.setScene(new Scene(root, 1000, 900));
         primaryStage.show();
     }
 

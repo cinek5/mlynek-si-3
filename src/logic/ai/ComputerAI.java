@@ -10,4 +10,5 @@ import logic.moves.Move;
 public interface ComputerAI
 {
     Move getBestPossibleMove(GameController gameController);
+    int getNodesVisited();
 }

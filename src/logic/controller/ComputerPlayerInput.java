@@ -23,4 +23,9 @@ public class ComputerPlayerInput implements GameInput {
     public Move getMove(GameController controller) {
         return computerAI.getBestPossibleMove(controller);
     }
+
+    public int getNodesVisited()
+    {
+        return computerAI.getNodesVisited();
+    }
 }

@@ -28,7 +28,43 @@ public class GameController {
     private GameInput whiteInput;
     private GameInput blackInput;
 
+    private boolean displayMoves=true;
 
+    private NodeType winner = NodeType.NONE;
+
+    private int numberOfMovesWhite = 0;
+    private int numberOfMovesBlack = 0;
+
+    private int computingTimeInMsBlack = 0;
+    private int computingTimeInMsWhite = 0;
+
+    public int getComputingTimeInMsBlack() {
+        return computingTimeInMsBlack;
+    }
+
+
+    public int getComputingTimeInMsWhite() {
+        return computingTimeInMsWhite;
+    }
+
+
+    public Move getLastNonCapturingMoveForWhite() {
+        return lastNonCapturingMoveForWhite;
+    }
+
+
+
+    public Move getLastNonCapturingMoveForBlack() {
+        return lastNonCapturingMoveForBlack;
+    }
+
+    public int getNumberOfMovesWhite() {
+        return numberOfMovesWhite;
+    }
+
+    public int getNumberOfMovesBlack() {
+        return numberOfMovesBlack;
+    }
 
     public Queue<Move> getMovesHistoryWhite() {
         return movesHistoryWhite;
@@ -46,6 +82,11 @@ public class GameController {
         return wasMillInPreviousTurn;
     }
 
+    public void setDisplayMoves(boolean displayMoves)
+    {
+        this.displayMoves = displayMoves;
+    }
+
     public GameController(NodeType firstPlayerTurn, GameInput whiteInput, GameInput blackInput) {
         this.movesHistoryWhite = new ArrayDeque<>();
         this.movesHistoryBlack = new ArrayDeque<>();
@@ -58,36 +99,40 @@ public class GameController {
     }
 
 
-    public void game() {
-        while (!someoneWon()) {
-
-            playSingleTurn();
+    public NodeType game() {
+        while (!someoneWon() && playSingleTurn());
 
 
 
-        }
+
 
         board.printBoard();
 
+        return winner;
 
     }
 
-    public void playSingleTurn()
+    public boolean playSingleTurn()
     {
-        board.printBoard();
+        if (displayMoves) {
+            board.printBoard();
+        }
 
         setGamePhase();
-        if (!wasMillInPreviousTurn) {
-            System.out.println(gamePhase);
-        } else
-        {
-            System.out.println("CAPTURING ");
+        if (displayMoves) {
+            if (!wasMillInPreviousTurn) {
+                System.out.println(gamePhase);
+            } else {
+                System.out.println("CAPTURING ");
+            }
         }
 
         boolean validMove = false;
         Move nextMove = null;
 
-        System.out.println("Ruch gracza: "+playerTurn);
+        if( displayMoves ) {
+            System.out.println("Ruch gracza: " + playerTurn);
+        }
         GameInput currentInput;
         while(!validMove) {
             if (playerTurn == NodeType.WHITE) {
@@ -96,7 +141,11 @@ public class GameController {
                 currentInput = blackInput;
             }
 
+            long start = System.nanoTime();
+
             nextMove = currentInput.getMove(this);
+
+            long end = System.nanoTime();
 
             if (currentInput instanceof  PlayerInput)
             {
@@ -106,14 +155,32 @@ public class GameController {
                 }
 
             }
+
+
             else
             {
+                if (playerTurn==NodeType.BLACK)
+                {
+                    numberOfMovesBlack++;
+                    computingTimeInMsBlack+=((start-end)/1000);
+                }
+                else
+                {
+                    numberOfMovesWhite++;
+                    computingTimeInMsWhite+=((start-end)/1000);
+                }
                 validMove = true;
             }
 
 
         }
 
+        if (nextMove==null)
+        {
+            System.out.println("Player "+playerTurn+" has been blocked. "+Utils.getOppositeNodeType(playerTurn)+" has won");
+            winner = Utils.getOppositeNodeType(playerTurn);
+            return false;
+        }
         nextMove.makeMove(board);
 
 
@@ -123,7 +190,7 @@ public class GameController {
 
         int mills = board.countMills(playerTurn);
 
-        if (mills>0)
+        if (mills>0 && displayMoves)
         {
             System.out.println("MLYNEK: "+mills);
         }
@@ -135,6 +202,7 @@ public class GameController {
 
         wasMillInPreviousTurn = mills>0;
 
+        return true;
 
 
     }
@@ -267,16 +335,23 @@ public class GameController {
     public List<Move> generatePossibleMovingMoves(NodeType playerNodeType)
     {
         List<Move> moves = new ArrayList<>();
-        List<Node> playerNodes = board.getNodes().stream().filter( node -> node.getNodeType()==playerNodeType)
-                .collect(Collectors.toList());Collectors.toList();
+        List<Node>  nodes = board.getNodes();
 
-        List<Integer> freeNodeIndexes = board.getNodes().stream().filter(node->node.getNodeType()==NodeType.NONE)
-                .map( node -> node.getIndex()).collect(Collectors.toList());
 
-        for (Node node: playerNodes)
+        for (Node node: nodes)
         {
-            for (Integer toIndex : freeNodeIndexes)
+            if (node.getNodeType()!=playerNodeType)
             {
+                continue;
+            }
+
+            for (Node nodeTo : nodes)
+            {
+                if (nodeTo.getNodeType()!=NodeType.NONE)
+                {
+                    continue;
+                }
+                int toIndex  = nodeTo.getIndex();
                 int fromIndex = node.getIndex();
                 if (!wasNodeHereInPreviousMove(playerNodeType, toIndex, fromIndex))
                 {
@@ -417,21 +492,25 @@ public class GameController {
         if (hasLostByPiecesCapture(NodeType.BLACK))
         {
            System.out.println("WHITE HAS WON! Black has too few pieces.");
+           winner = NodeType.WHITE;
            return true;
         }
         if (hasLostByPiecesCapture(NodeType.WHITE))
         {
+            winner = NodeType.BLACK;
             System.out.println("BLACK HAS WON!!! White has too few pieces.");
             return true;
         }
 
         if (isBlocked(NodeType.BLACK))
         {
+            winner =NodeType.WHITE;
             System.out.println("White has won! Black is blocked.");
             return true;
         }
         if (isBlocked(NodeType.WHITE))
         {
+            winner = NodeType.BLACK;
             System.out.println("Black has won! White is blocked.");
             return true;
         }
